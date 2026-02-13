@@ -15,5 +15,14 @@ export async function GET(req: Request) {
   const { data: order } = await sb.from("orders").select("status, amount, ebooks(title)").eq("id", orderId).eq("user_id", auth.user.id).single();
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return NextResponse.json({ status: order.status, amount: order.amount, ebookTitle: order.ebooks?.title ?? "" });
+ const ebookTitle =
+  Array.isArray((order as any).ebooks)
+    ? ((order as any).ebooks[0]?.title ?? "")
+    : ((order as any).ebooks?.title ?? "");
+
+return NextResponse.json({
+  status: order.status,
+  amount: order.amount,
+  ebookTitle,
+});
 }
