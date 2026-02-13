@@ -21,9 +21,12 @@ export async function GET(req: Request) {
 
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return NextResponse.json({
-    status: order.status,
-    amount: order.amount,
-    ebookTitle: order.ebooks?.[0]?.title ?? "",
-  });
+const ebooks = (order as any).ebooks as { title: string }[] | null;
+const ebookTitle = ebooks?.[0]?.title ?? "";
+
+return NextResponse.json({
+  status: order.status,
+  amount: order.amount,
+  ebookTitle,
+});
 }
