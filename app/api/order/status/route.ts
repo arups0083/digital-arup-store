@@ -1,10 +1,7 @@
-// @ts-nocheck
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
-
-type EbookRel = { title: string | null } | { title: string | null }[] | null;
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -16,10 +13,12 @@ export async function GET(req: Request) {
 
   const sb = supabaseServer();
 
-  const { data: auth, error: authError } = await sb.auth.getUser();
-  const user = auth?.user;
+  const {
+    data: { user },
+    error: userError,
+  } = await sb.auth.getUser();
 
-  if (authError || !user) {
+  if (userError || !user) {
     return NextResponse.json({ error: "Login required" }, { status: 401 });
   }
 
@@ -28,20 +27,20 @@ export async function GET(req: Request) {
     .select("status, amount, ebooks(title)")
     .eq("id", orderId)
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle();
 
   if (orderError || !order) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const ebooksRel = (order as any).ebooks as EbookRel;
-
+  // ebooks relation object বা array—দুইভাবেই আসতে পারে, তাই safe handling
+  const ebooksRel: any = (order as any).ebooks;
   const ebookTitle =
-    Array.isArray(ebooksRel) ? (ebooksRel?.[0]?.title ?? "") : (ebooksRel?.title ?? "");
+    Array.isArray(ebooksRel) ? (ebooksRel[0]?.title ?? "") : (ebooksRel?.title ?? "");
 
   return NextResponse.json({
     status: (order as any).status,
-    amount: (order as any).amount ?? 0,
+    amount: (order as any).amount,
     ebookTitle,
   });
 }
