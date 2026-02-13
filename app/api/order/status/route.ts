@@ -3,6 +3,8 @@ import { supabaseServer } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
+type EbookRel = { title: string | null } | { title: string | null }[] | null;
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const orderId = url.searchParams.get("orderId");
@@ -14,10 +16,9 @@ export async function GET(req: Request) {
   const sb = supabaseServer();
 
   const { data: auth, error: authError } = await sb.auth.getUser();
-  if (authError) console.error(authError);
-
   const user = auth?.user;
-  if (!user) {
+
+  if (authError || !user) {
     return NextResponse.json({ error: "Login required" }, { status: 401 });
   }
 
@@ -32,16 +33,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // ✅ ebooks relation object অথবা array—দুইটাই handle করছি
-  const ebooksRel = (order as any).ebooks;
+  const ebooksRel = (order as any).ebooks as EbookRel;
 
-  const ebookTitle = Array.isArray(ebooksRel)
-    ? (ebooksRel[0]?.title ?? "")
-    : (ebooksRel?.title ?? "");
+  const ebookTitle =
+    Array.isArray(ebooksRel) ? (ebooksRel?.[0]?.title ?? "") : (ebooksRel?.title ?? "");
 
   return NextResponse.json({
     status: (order as any).status,
-    amount: (order as any).amount,
+    amount: (order as any).amount ?? 0,
     ebookTitle,
   });
 }
