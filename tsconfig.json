@@ -1,4 +1,10 @@
-{
+"include": [
+  "next-env.d.ts",
+  "**/*.ts",
+  "**/*.tsx",
+  "**/*.d.ts",
+  ".next/types/**/*.ts"
+],{
   "compilerOptions": {
     "target": "ES2022",
     "lib": [
