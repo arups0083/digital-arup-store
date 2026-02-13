@@ -6,24 +6,36 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const orderId = url.searchParams.get("orderId");
-  if (!orderId) return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+
+  if (!orderId) {
+    return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+  }
 
   const sb = supabaseServer();
-  const { data: auth } = await sb.auth.getUser();
-  if (!auth.user) return NextResponse.json({ error: "Login required" }, { status: 401 });
 
-  const { data: order } = await sb
+  const { data: auth, error: authError } = await sb.auth.getUser();
+  if (authError || !auth?.user) {
+    return NextResponse.json({ error: "Login required" }, { status: 401 });
+  }
+
+  const { data: order, error: orderError } = await sb
     .from("orders")
     .select("status, amount, ebooks(title)")
     .eq("id", orderId)
     .eq("user_id", auth.user.id)
     .single();
 
-  if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (orderError || !order) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  const ebooksRel: any = (order as any).ebooks;
+  const ebookTitle =
+    Array.isArray(ebooksRel) ? (ebooksRel?.[0]?.title ?? "") : (ebooksRel?.title ?? "");
 
   return NextResponse.json({
-    status: order.status,
-    amount: order.amount,
-    ebookTitle: order.ebooks?.[0]?.title ?? "",
+    status: (order as any).status,
+    amount: (order as any).amount,
+    ebookTitle,
   });
 }
