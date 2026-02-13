@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="96" viewBox="0 0 320 96" fill="none">
+  <rect x="0" y="0" width="320" height="96" rx="24" fill="#0F172A"/>
+  <g transform="translate(18,18)">
+    <rect x="0" y="0" width="60" height="60" rx="18" fill="#FFFFFF" opacity="0.12"/>
+    <path d="M18 44V16h14.5c8.7 0 14.5 5.4 14.5 14s-5.8 14-14.5 14H18zm8-6h6.3c5.3 0 8.7-3.2 8.7-8s-3.4-8-8.7-8H26v16z" fill="#FFFFFF"/>
+    <path d="M52 44l-6.2-10.4 6-10.6h9l-6.9 10.6L61 44h-9z" fill="#FFFFFF" opacity="0.85"/>
+  </g>
+  <text x="98" y="43" fill="#FFFFFF" font-size="26" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto" font-weight="800">Digital Arup</text>
+  <text x="98" y="67" fill="#CBD5E1" font-size="14" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto" font-weight="500">Ebook Store</text>
+</svg>
