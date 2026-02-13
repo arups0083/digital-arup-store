@@ -12,8 +12,18 @@ export async function GET(req: Request) {
   const { data: auth } = await sb.auth.getUser();
   if (!auth.user) return NextResponse.json({ error: "Login required" }, { status: 401 });
 
-  const { data: order } = await sb.from("orders").select("status, amount, ebooks(title)").eq("id", orderId).eq("user_id", auth.user.id).single();
+  const { data: order } = await sb
+    .from("orders")
+    .select("status, amount, ebooks(title)")
+    .eq("id", orderId)
+    .eq("user_id", auth.user.id)
+    .single();
+
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  return NextResponse.json({ status: order.status, amount: order.amount, ebookTitle: order.ebooks?.title ?? "" });
+  return NextResponse.json({
+    status: order.status,
+    amount: order.amount,
+    ebookTitle: order.ebooks?.[0]?.title ?? "",
+  });
 }
